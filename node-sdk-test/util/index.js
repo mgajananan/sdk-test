@@ -10,7 +10,7 @@ const utils = require('../util');
 const queryString = require('querystring');
 const crypto = require('crypto');
 const constants = require('constants');
-
+expect = chai.expect;
 
 
 
@@ -38,38 +38,41 @@ const constants = require('constants');
 //   }
 // });
 
-const endPointIdentity = bsconfig.endPointIdentity;
-const redirectUriIdentity = bsconfig.redirectUriIdentity;
-const redirectUriPortal = bsconfig.redirectUriPortal;
-const endPointPortal = bsconfig.endPointPortal;
-const endPointCollab = bsconfig.endPointCollab;
-const identityClientId = bsconfig.identityClientId;
-const portalClientId = bsconfig.portalClientId;
+const env = bsconfig.stg;
+
+const endPointIdentity = env.endPointIdentity;
+const redirectUriIdentity = env.redirectUriIdentity;
+const redirectUriPortal = env.redirectUriPortal;
+const endPointPortal = env.endPointPortal;
+const endPointCollab = env.endPointCollab;
+const identityClientId = env.identityClientId;
+const portalClientId = env.portalClientId;
 
 
 
-module.exports.getUserAccessToken = () => new Promise((resolve, reject) => {
+module.exports.getAdminAccessToken = () => new Promise((resolve, reject) => {
   return new Promise((resolve, reject) => {
     chai.request(endPointIdentity)
       .post('/api/authenticate')
       .set('content-type', 'application/json')
       .send(JSON.stringify({
-        email: 'stagbsuser@gmail.com',
-        password: 'Blue_1234',
+        email: bsconfig.useremail,
+        password: bsconfig.userpwd,
       }))
-      .end(function (error, response, body) {
+      .end(function (error, response) {
         if (error) {
           console.log('Auth Error::' + error);
+          return reject(error);
           // done(error);
         } else {
-          // console.log('Auth::' + JSON.stringify(response));
-          // console.log('token::' + response.headers['set-cookie']);
-          var token = JSON.stringify(response.headers['set-cookie']).split(';')[0].split('=')[1];
+          console.log('Auth::' + JSON.stringify(response));
+          console.log('token::' + response.headers['set-cookie']);
+          // var token = JSON.stringify(response.headers['set-cookie']).split(';')[0].split('=')[1];
           // console.log('token::' + token);
-          return resolve(token);
+          return resolve(response.headers['set-cookie']);
         }
       });
-    //  .expect(200, (error, response) => { 
+    // .expect(200, (error, response) => {
     //   if (error) {
     //     console.log(error)
     //     return reject(error);
@@ -78,28 +81,43 @@ module.exports.getUserAccessToken = () => new Promise((resolve, reject) => {
     //   return resolve(response.headers['set-cookie']);
     // });
   })
-    // .then((cookies) => {
-    //   return new Promise((resolve, reject) => {
-    //     chai.request(endPointIdentity)
-    //     .get('/oauth2/authorize')
-    //     .query({
-    //       response_type: 'id_token token',
-    //       client_id: '97a3fd88f3fe833197b0dcd2b71f5e0451a06ecc',
-    //       redirect_uri: redirectUriPortal + '/oauth/callback',
-    //       nonce: 'nonce',
-    //     })
-    //     .set('Cookie', cookies)
-    //     .expect(302, (error, response) => {
-    //       if (error) {
-    //         return reject(error);
-    //       } else if (response.headers.location) {
-    //         const queryData = queryString.parse(url.parse(response.headers.location).hash);
-    //         return resolve(queryData['#access_token']);
-    //       }
-    //       return 'Invalid Header location';
-    //     });
-    //   });
-    // })
+    .then((cookies) => {
+      return new Promise((resolve, reject) => {
+        chai.request(endPointIdentity)
+          .get('/oauth2/authorize')
+          .query({
+            response_type: 'id_token token',
+            client_id: 'ab5ce3b6f0ab419a7390e5e548c51d0e691245da' , //portalClientId,
+            redirect_uri: 'http://localhost:9400/oauth/callback', //redirectUriPortal,
+            nonce: 'nonce',
+          })
+          .redirects(0)
+          .set('Cookie', cookies)
+          .end(function (error, response) {
+            if (error) {
+              console.log('Auth Error::' + error);
+              return reject(error);
+            } else if (response.headers.location) {
+              const queryData = queryString.parse(url.parse(response.headers.location).hash);
+              console.log('Auth----' + JSON.stringify(response));
+              console.log('token----' + queryData['#access_token']);
+              return resolve(queryData['#access_token']);
+            }
+            // .expect(302, (error, response) => {
+            //   if (error) {
+            //     console.log('Auth Error::' + error);
+            //     return reject(error);
+            //   } else if (response.headers.location) {
+            //     const queryData = queryString.parse(url.parse(response.headers.location).hash);
+            //     console.log('Auth::' + JSON.stringify(response));
+            //     console.log('token::' + queryData['#access_token']);
+            //     return resolve(queryData['#access_token']);
+            //   }
+           console.log(response);
+            return 'Invalid Header location';
+          });
+      });
+    })
     .then(token => resolve(token))
     .catch(error => reject(error));
 });
@@ -157,25 +175,73 @@ module.exports.getUserAccessToken = () => new Promise((resolve, reject) => {
 //     });
 // });
 
+// module.exports.getAdminAccessToken = () => new Promise((resolve, reject) => {
+//   return new Promise((resolve, reject) => {
+//     chai.request(endPointIdentity)
+//       .post('/api/authenticate')
+//       .set('content-type', 'application/json')
+//       .send(JSON.stringify({
+//         email: bsconfig.adminemail,
+//         password: bsconfig.adminpwd,
+//       }))
+//       .end(function (error, response, body) {
+//         if (error) {
+//           console.log('Auth Error::' + error);
+//         } else {
+//           var token = JSON.stringify(response.headers['set-cookie']).split(';')[0].split('=')[1];
+//           return resolve(token);
+//         }
+//       });
+//   })
+//     .then(token => resolve(token))
+//     .catch(error => reject(error));
+// });
 
-module.exports.getAdminAccessToken = () => new Promise((resolve, reject) => {
-  return new Promise((resolve, reject) => {
-    chai.request(endPointIdentity)
-      .post('/api/authenticate')
-      .set('content-type', 'application/json')
-      .send(JSON.stringify({
-        email: 'stagbstest@gmail.com',
-        password: 'Blue_1234',
-      }))
-      .end(function (error, response, body) {
-        if (error) {
-          console.log('Auth Error::' + error);
-        } else {
-          var token = JSON.stringify(response.headers['set-cookie']).split(';')[0].split('=')[1];
-          return resolve(token);
-        }
-      });
-  })
-    .then(token => resolve(token))
-    .catch(error => reject(error));
-});
+
+
+
+
+
+
+
+
+// const AuthLib = require('bluescape-auth-library');
+// // const bsconfig = require('../config');
+
+// const credentials = {
+//   client: {
+//     id: bsconfig.portalClientId,
+//     redirectUri : bsconfig.redirectUriPortal
+//   }
+// };
+
+// const authLib = new AuthLib(credentials);
+// const options = {
+//     user: {
+//         email: bsconfig.adminemail,
+//         password: bsconfig.adminpwd
+//     }
+//     //   responseUrl: 'https://www.client.com/oauth/callback#?access_token=XXX'
+// };
+
+// const authorizeURL = authLib.implicit.authorizeURL();
+// console.log(authorizeURL);
+
+// module.exports.authLib.implicit.getToken(options, (error, accessToken) => {
+//     if (error) {
+//         return console.log('Implicit OAUTH Access Token Error', error.message);
+//     }
+//     console.log(accessToken);
+//     return accessToken;
+// });
+
+
+// authLib.implicit
+//     .getToken(options)
+//     .then((accessToken) => {
+//         console.log(accessToken);
+//         return accessToken;
+//     })
+//     .catch((error) => {
+//         console.log('Implicit OAUTH Access Token error', error.message);
+//     });

@@ -7,7 +7,7 @@
     "lint": "eslint lib",
     "test": "mocha --reporter mochawesome --reporter-options o=SdkTestReports,f=NodeSdkTestReport --recursive --timeout 10000"
   },
-  "devDependencies": { 
+  "devDependencies": {
     "eslint": "^3.18.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
@@ -15,6 +15,8 @@
     "eslint-plugin-react": "^6.10.3"
   },
   "dependencies": {
+    "bluescape-auth-library": "https://github.com/Bluescape/auth-library.git#4b0d78c807423c2cd53c52ccbf543f25bbd9f0a8",
+    "bluescape-sdk-node": "^1.0.1",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "fs": "0.0.1-security",
