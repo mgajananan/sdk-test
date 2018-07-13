@@ -5,7 +5,7 @@
   "main": "sdktest.js",
   "scripts": {
     "lint": "eslint lib",
-    "test": "mocha --reporter mochawesome --reporter-options o=SdkTestReports,f=NodeSdkTestReport --recursive --timeout 10000"
+    "test": "NODE_ENV=testing mocha --reporter mochawesome --reporter-options o=SdkTestReports,f=NodeSdkTestReport --recursive --timeout 10000"
   },
   "devDependencies": {
     "eslint": "^3.18.0",

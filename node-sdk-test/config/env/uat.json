@@ -1,0 +1,21 @@
+{
+    "adminuser": {
+        "email": "stagbstest@gmail.com",
+        "password": "Blue_1234",
+        "userid": 6581
+    },
+    "nonadminuser": {
+        "email": "stagbsuser@gmail.com",
+        "password": "Blue_1234"
+    },
+    "workscapedetails": {
+        "workspaceid": 850066
+    },
+    "endPointIdentity": "https://identity-api.uat.bluescape.com",
+    "redirectUriIdentity": "https://identity.uat.bluescape.com",
+    "redirectUriPortal": "https://portal.uat.bluescape.com",
+    "endPointPortal": "https://portal-api.uat.bluescape.com/api",
+    "endPointCollab": "https://collab.uat.bluescape.com/api/workspaces",
+    "identityClientId": "a177d900920ce8f9ee8e03126c36645cbcf2b79d",
+    "portalClientId": "97a3fd88f3fe833197b0dcd2b71f5e0451a06ecc"
+}
